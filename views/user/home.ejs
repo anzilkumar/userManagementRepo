@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Game Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/homeStyle.css">
+</head>
+<body>
+    <div class="home-shell">
+        <aside class="profile-sidebar">
+            <div class="sidebar-top">
+                <div class="avatar-wrap">
+                    <% if (user.profileImage) { %>
+                        <img src="<%= user.profileImage %>" alt="<%= user.username %> profile image">
+                    <% } else { %>
+                        <div class="avatar-fallback"><%= user.username.slice(0, 1).toUpperCase() %></div>
+                    <% } %>
+                </div>
+                <h1><%= user.username %></h1>
+                <p><%= user.email %></p>
+            </div>
+            <a class="logout-button" href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+        </aside>
+
+        <main class="dashboard-main">
+            <!-- Initial View -->
+            <section id="gameSelection" class="game-selection">
+                <div class="game-cards">
+                    <div class="game-card" data-game="crossword">
+                        <i class="fa-solid fa-table-cells"></i>
+                        <h3>Crossword</h3>
+                        <p>Test your technical vocabulary using clues and logic.</p>
+                        <ul class="game-info-list">
+                            <li>• 6 questions</li>
+                            <li>• 3 minutes</li>
+                            <li>• Across + Down clues</li>
+                        </ul>
+                    </div>
+                    <div class="game-card" data-game="word-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <h3>Word Search</h3>
+                        <p>Find hidden technical words inside the puzzle grid.</p>
+                        <ul class="game-info-list">
+                            <li>• 6 words</li>
+                            <li>• 3 minutes</li>
+                            <li>• Drag to select words</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="recent-players-section" style="margin-top: 50px; width: 100%; max-width: 800px; text-align: left;">
+                    <h3 style="color: #b5e1ef; margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">Recent Players</h3>
+                    <div class="recent-players-list" style="display: flex; flex-direction: column; gap: 10px;">
+                        <% if (typeof recentScores !== 'undefined' && recentScores && recentScores.length > 0) { %>
+                            <% recentScores.forEach(function(score) { %>
+                                <% 
+                                    const m = Math.floor(score.completionTimeMs / 1000 / 60).toString().padStart(2, '0');
+                                    const s = Math.floor((score.completionTimeMs / 1000) % 60).toString().padStart(2, '0');
+                                    const timeStr = m + ':' + s;
+                                %>
+                                <div class="recent-player-card" style="display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.2); padding: 12px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                                    <img src="<%= score.user && score.user.profileImage ? score.user.profileImage : '/img/default-avatar.png' %>" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                                    <strong style="color: #fff; min-width: 100px; font-size: 15px;"><%= score.user ? score.user.username : 'Unknown' %></strong>
+                                    <span style="color: #b5e1ef; flex-grow: 1; font-size: 14px;">— <span style="text-transform: capitalize;"><%= (score.gameType||'').replace('-', ' ') %></span> — <span style="color: #f1c40f;"><%= score.score %> pts</span> — <i class="fa-regular fa-clock"></i> <%= timeStr %></span>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <p style="color: #888; font-style: italic;">No recent games played yet.</p>
+                        <% } %>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Game Stage -->
+            <section id="gameStage" class="game-stage" hidden>
+                <div class="game-stage-header">
+                    <button id="backToSelectionBtn" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                </div>
+                
+                <div class="game-layout">
+                    <div class="game-board-container" id="boardContainer">
+                        <div class="timer-display-container" style="background: rgba(0,0,0,0.3); padding: 8px 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); text-align: center; margin-bottom: 25px; font-weight: bold; font-size: 18px; color: #e0e0e0; letter-spacing: 1px; width: fit-content;">
+                            ⏱ Time Remaining: <span id="timerDisplay">03:00</span>
+                        </div>
+                        <div class="grid-board" id="gameBoard"></div>
+                    </div>
+                    <aside class="clue-panel">
+                        <div class="clue-panel-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                            <h4 id="cluePanelTitle" style="margin: 0; font-size: 18px; color: #ffffff;">Questions</h4>
+                            <div class="points-display" style="font-size: 14px; color: #f1c40f; font-weight: bold;">
+                                Points: <span id="liveScoreDisplay">0</span>
+                            </div>
+                        </div>
+                        <div id="clueList" class="clue-list"></div>
+                        <button class="submit-btn" id="submitGameBtn" type="button">Submit answers</button>
+                    </aside>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Hidden Notice -->
+    <div class="notice" id="notice" hidden></div>
+
+    <script>
+        window.CURRENT_USER = `${userJson}`;
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/fallbackQuestions.js"></script>
+    <script src="/js/homeDashboard.js"></script>
+</body>
+</html>

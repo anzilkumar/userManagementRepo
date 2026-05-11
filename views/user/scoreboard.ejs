@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Scoreboard</title>
+    <link rel="stylesheet" href="/css/homeStyle.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/scoreboard.css">
+</head>
+<body class="dashboard-body">
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="user-profile">
+                <img src="<%= user.profileImage || '/img/default-avatar.png' %>" alt="Profile Picture" class="profile-pic">
+                <h3 class="username"><%= user.username %></h3>
+                <p class="user-email"><%= user.email %></p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/logout" class="nav-btn logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main scoreboard-page-wrap">
+            <section class="scoreboard-section">
+                <div class="scoreboard-header">
+                    <button id="backToHomeBtn" class="back-btn" onclick="window.location.href='/home'"><i class="fa-solid fa-arrow-left"></i> Back to Games</button>
+                    <h2>Global Scoreboard</h2>
+                </div>
+
+                <div class="scoreboard-tabs">
+                    <button class="tab-btn active" data-type="crossword">Crossword</button>
+                    <button class="tab-btn" data-type="word-search">Word Search</button>
+                </div>
+
+                <div class="scoreboard-table-wrap">
+                    <table class="scoreboard-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Player</th>
+                                <th>Score</th>
+                                <th>Time</th>
+                                <th>Game</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scoreboardBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: #b5e1ef;">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tbody = document.getElementById('scoreboardBody');
+            const tabs = document.querySelectorAll('.tab-btn');
+            let allScores = [];
+
+            const formatTime = (seconds) => {
+                const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                const s = (seconds % 60).toString().padStart(2, '0');
+                return `${m}:${s}`;
+            };
+
+            const renderScores = (gameType) => {
+                tbody.innerHTML = '';
+                // Filter scores by game type
+                let filtered = allScores.filter(s => s.gameType === gameType);
+                
+                // Sorting logic: points descending, then time taken ascending, then newly registered user wins ties
+                filtered.sort((a, b) => {
+                    if (b.score !== a.score) return b.score - a.score;
+                    if (a.completionTimeMs !== b.completionTimeMs) return a.completionTimeMs - b.completionTimeMs;
+                    const aId = a.id ? String(a.id) : '';
+                    const bId = b.id ? String(b.id) : '';
+                    return bId.localeCompare(aId); // Most recent wins
+                });
+
+                if (filtered.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #b5e1ef;">No scores available for this game type yet.</td></tr>';
+                    return;
+                }
+
+                filtered.forEach((s, i) => {
+                    const tr = document.createElement('tr');
+                    const imgUrl = s.profileImage ? s.profileImage : '/img/default-avatar.png';
+                    const username = s.username ? s.username : 'Unknown Player';
+                    const timeStr = formatTime((s.completionTimeMs || 0) / 1000);
+                    
+                    let rankTpl = `<td>${i + 1}</td>`;
+                    if (i === 0) rankTpl = `<td><span class="medal">🥇</span> 1</td>`;
+                    if (i === 1) rankTpl = `<td><span class="medal">🥈</span> 2</td>`;
+                    if (i === 2) rankTpl = `<td><span class="medal">🥉</span> 3</td>`;
+                    
+                    tr.innerHTML = `
+                        ${rankTpl}
+                        <td>
+                            <div class="score-player-info">
+                                <img src="${imgUrl}" alt="Avatar" class="score-avatar">
+                                <span>${username}</span>
+                            </div>
+                        </td>
+                        <td><strong>${s.score}</strong></td>
+                        <td>${timeStr}</td>
+                        <td style="text-transform: capitalize;">${(s.gameType || 'Unknown').replace('-', ' ')}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            };
+
+            const loadScoreboard = async () => {
+                try {
+                    const res = await fetch('/api/scoreboard?limit=100');
+                    const data = await res.json();
+                    if (data.success) {
+                        allScores = data.scoreboard ? data.scoreboard.entries : [];
+                        renderScores('crossword'); // default
+                    }
+                } catch (error) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #e74c3c;">Failed to load scoreboard.</td></tr>';
+                }
+            };
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    e.target.classList.add('active');
+                    renderScores(e.target.dataset.type);
+                });
+            });
+
+            loadScoreboard();
+        });
+    </script>
+</body>
+</html>

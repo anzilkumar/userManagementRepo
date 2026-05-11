@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/adminStyle.css">
+</head>
+
+<body class="dashboard-page">
+    <main class="dashboard-wrapper">
+        <header class="dashboard-header">
+            <div>
+                <h1>Admin Dashboard</h1>
+                <p>Registered users</p>
+            </div>
+
+            <a class="logout-link" href="/admin/logout">Logout</a>
+        </header>
+
+        <section class="users-panel">
+            <h2>User moderation</h2>
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Games</th>
+                        <th>Points</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (users.length === 0) { %>
+                        <tr>
+                            <td colspan="7" class="empty-users">No users found</td>
+                        </tr>
+                    <% } %>
+
+                    <% users.forEach((user, index) => { %>
+                        <tr data-user-row="<%= user._id %>">
+                            <td><%= index + 1 %></td>
+                            <td><%= user.username %></td>
+                            <td><%= user.email %></td>
+                            <td><%= user.completedGames %></td>
+                            <td><%= user.totalPoints %></td>
+                            <td>
+                                <span class="status-pill <%= user.isBlocked ? 'danger' : 'ok' %>">
+                                    <%= user.isBlocked ? 'Blocked' : 'Active' %>
+                                </span>
+                                <% if (user.scoreboardHidden) { %>
+                                    <span class="status-pill muted">Score hidden</span>
+                                <% } %>
+                            </td>
+                            <td class="actions-cell">
+                                <button class="admin-action" data-action="block" data-user-id="<%= user._id %>" type="button">
+                                    <%= user.isBlocked ? 'Unblock' : 'Block' %>
+                                </button>
+                                <button class="admin-action" data-action="scoreboard-visibility" data-user-id="<%= user._id %>" type="button">
+                                    <%= user.scoreboardHidden ? 'Show scores' : 'Hide scores' %>
+                                </button>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="users-panel scores-panel">
+            <h2>Score moderation</h2>
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>User</th>
+                        <th>Score</th>
+                        <th>Time</th>
+                        <th>Topic</th>
+                        <th>Game</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (scores.length === 0) { %>
+                        <tr>
+                            <td colspan="7" class="empty-users">No scores found</td>
+                        </tr>
+                    <% } %>
+
+                    <% scores.forEach((score, index) => { %>
+                        <tr data-score-row="<%= score._id %>">
+                            <td>#<%= index + 1 %></td>
+                            <td><%= score.user ? score.user.username : 'Deleted user' %></td>
+                            <td><%= score.score %></td>
+                            <td><%= Math.floor(score.completionTimeMs / 1000) %>s</td>
+                            <td><%= score.topic %></td>
+                            <td><%= score.gameType %></td>
+                            <td>
+                                <button class="admin-action danger-button" data-action="delete-score" data-score-id="<%= score._id %>" type="button">
+                                    Remove
+                                </button>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script src="/js/adminDashboard.js"></script>
+</body>
+
+</html>

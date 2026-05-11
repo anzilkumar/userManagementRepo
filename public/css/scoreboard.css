@@ -1,0 +1,110 @@
+/* Scoreboard specific styles */
+
+.scoreboard-page-wrap {
+    padding: 50px 20px;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.scoreboard-tabs {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.tab-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #b5e1ef;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+.tab-btn.active, .tab-btn:hover {
+    background: #195e74;
+    color: white;
+    border-color: #195e74;
+}
+
+.medal {
+    font-size: 18px;
+    margin-right: 5px;
+}
+
+.scoreboard-section {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    background: rgba(14, 21, 37, 0.7);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    animation: fadeIn 0.4s ease;
+}
+
+.scoreboard-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.scoreboard-header h2 {
+    font-size: 28px;
+    font-weight: 600;
+    flex-grow: 1;
+    text-align: center;
+}
+
+.scoreboard-table-wrap {
+    overflow-x: auto;
+}
+
+.scoreboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.scoreboard-table th {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    text-align: left;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #b5e1ef;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.scoreboard-table td {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: #e0e0e0;
+    vertical-align: middle;
+}
+
+.scoreboard-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.score-player-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.score-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #195e74;
+}

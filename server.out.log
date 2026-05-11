@@ -1,0 +1,7 @@
+
+> project@1.0.0 start
+> node server.js
+
+Connected to MongoDB
+Question bank ready (120 questions checked)
+Server running on http://localhost:3200/
