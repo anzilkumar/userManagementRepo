@@ -35,6 +35,22 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    totalPoints: {
+        type: Number,
+        default: 0
+    },
+    completedGames: {
+        type: Number,
+        default: 0
+    },
+    averageScore: {
+        type: Number,
+        default: 0
+    },
+    fastestTime: {
+        type: Number, // In seconds
+        default: null
+    },
     isBlocked: {
         type: Boolean,
         default: false,

@@ -60,3 +60,26 @@ export const submitGame = async (req, res) => {
         result
     });
 };
+
+import Score from '../models/scoreModel.js';
+
+export const getScoreboard = async (req, res) => {
+    try {
+        const topScores = await Score.find({ isHidden: false })
+            .populate('userId', 'username profileImage isBlocked')
+            .sort({ score: -1, completionTime: 1 })
+            .limit(50)
+            .lean();
+
+        const validScores = topScores.filter(score => score.userId && !score.userId.isBlocked);
+
+        validScores.forEach((score, index) => {
+            score.rank = index + 1;
+        });
+
+        return res.status(200).json({ success: true, data: validScores });
+    } catch (error) {
+        console.error('Error fetching scoreboard:', error);
+        return res.status(500).json({ success: false, message: 'Server error fetching scoreboard' });
+    }
+};

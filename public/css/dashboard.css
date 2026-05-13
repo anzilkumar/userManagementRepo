@@ -15,16 +15,14 @@ body:has(.dashboard-wrapper) {
 .sidebar {
     width: 250px;
     min-height: 100vh;
-    background-color: rgba(69, 126, 148, 0.95);
+    background-color: #457e94;
     color: #fff;
     padding: 40px 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
     flex-shrink: 0;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
 }
 
 .profile-section {
@@ -88,7 +86,7 @@ body:has(.dashboard-wrapper) {
     overflow-y: auto;
     color: #fff;
     position: relative;
-    background: linear-gradient(135deg, #6a9cb0 0%, #51859b 100%);
+    background-color: #6695a7;
 }
 
 .dashboard-title {
@@ -229,29 +227,22 @@ body:has(.dashboard-wrapper) {
 }
 
 .grid-wrapper {
-    background-color: rgba(0, 0, 0, 0.15);
-    padding: 40px;
-    border-radius: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     overflow-x: auto;
     max-width: 100%;
+    margin-top: 60px; /* Push grid downward from the header for better balance */
 }
 
-/* Right Panel */
 .right-panel {
-    width: 320px;
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 30px;
-    border-radius: 12px;
+    width: 340px;
+    background-color: rgba(255, 255, 255, 0.08);
+    padding: 35px 30px;
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
@@ -289,13 +280,15 @@ body:has(.dashboard-wrapper) {
 }
 
 .question-list li {
-    padding: 10px 12px;
-    font-size: 15px;
-    color: rgba(255, 255, 255, 0.85);
+    padding: 12px 10px;
+    font-size: 13px;
+    color: #fff;
     transition: all 0.3s ease;
     border-radius: 6px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .question-list li:hover {
@@ -340,15 +333,15 @@ body:has(.dashboard-wrapper) {
 }
 
 .ws-cell {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     background-color: rgba(255, 255, 255, 0.15);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 18px;
     cursor: pointer;
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.2);
@@ -380,8 +373,8 @@ body:has(.dashboard-wrapper) {
 }
 
 .cw-cell {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     background-color: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 2px;
@@ -403,7 +396,7 @@ body:has(.dashboard-wrapper) {
     height: 100%;
     border: none;
     text-align: center;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
     text-transform: uppercase;
     color: #fff;

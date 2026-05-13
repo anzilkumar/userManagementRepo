@@ -3,6 +3,7 @@ import session from 'express-session';
 
 import userRoute from './routes/userRoute.js';
 import adminRoute from './routes/adminRoute.js';
+import gameRoute from './routes/gameRoute.js';
 import { attachUser } from './middlewares/authMiddleware.js';
 import { attachAdmin } from './middlewares/adminAuthMiddleware.js';
 
@@ -23,5 +24,6 @@ app.use(session({
 
 app.use('/', attachUser, userRoute);
 app.use('/admin', attachAdmin, adminRoute);
+app.use('/api/games', attachUser, gameRoute);
 
 export default app;

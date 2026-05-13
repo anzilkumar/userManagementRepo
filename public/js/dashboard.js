@@ -41,15 +41,18 @@ function getAllWords() {
     return [...topicsData.javascript, ...topicsData.nodejs, ...topicsData.mongodb];
 }
 
-// UI Navigation
+let timerInterval;
+
 function openGame(gameId) {
     document.getElementById('dashboardHome').style.display = 'none';
     if(gameId === 'wordSearch') {
         document.getElementById('wordSearchArea').style.display = 'block';
         initWordSearch();
+        startTimer('wordSearchArea');
     } else if (gameId === 'crossword') {
         document.getElementById('crosswordArea').style.display = 'block';
         initCrossword();
+        startTimer('crosswordArea');
     }
 }
 
@@ -57,6 +60,26 @@ function closeGame() {
     document.getElementById('wordSearchArea').style.display = 'none';
     document.getElementById('crosswordArea').style.display = 'none';
     document.getElementById('dashboardHome').style.display = 'block';
+    if (timerInterval) clearInterval(timerInterval);
+}
+
+function startTimer(areaId) {
+    if (timerInterval) clearInterval(timerInterval);
+    let timeLeft = 180; // 3 minutes
+    const timerDisplay = document.querySelector(`#${areaId} .timer`);
+    
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            timerDisplay.textContent = "0:00";
+            // Timer end logic can go here
+        }
+    }, 1000);
 }
 
 // ---------------- WORD SEARCH LOGIC ---------------- //
@@ -133,7 +156,7 @@ function initWordSearch() {
 
 function renderWordSearch() {
     const gridEl = document.getElementById('wsGrid');
-    gridEl.style.gridTemplateColumns = `repeat(${wsSize}, 32px)`;
+    gridEl.style.gridTemplateColumns = `repeat(${wsSize}, 40px)`;
     gridEl.innerHTML = '';
     
     for (let y = 0; y < wsSize; y++) {
@@ -378,7 +401,7 @@ function placeWord(word, clue, x, y, dir) {
 
 function renderCrossword() {
     const gridEl = document.getElementById('cwGrid');
-    gridEl.style.gridTemplateColumns = `repeat(${cwSize}, 32px)`;
+    gridEl.style.gridTemplateColumns = `repeat(${cwSize}, 40px)`;
     gridEl.innerHTML = '';
     
     for (let y = 0; y < cwSize; y++) {
