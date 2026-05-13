@@ -58,7 +58,7 @@ loginForm.addEventListener('submit', async (e) => {
         
         if (data.success) {
             window.location.href = data.redirectUrl;
-        } else if (data.message === 'Incorrect password') {
+        } else if (data.field === 'password') {
             passwordError.textContent = data.message;
         } else {
             usernameError.textContent = data.message || 'Invalid username or password';

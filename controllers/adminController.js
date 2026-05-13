@@ -24,11 +24,18 @@ export const adminLogin = async (req, res) => {
         return res.status(401).json(INVALID_ADMIN_LOGIN_RESPONSE);
     }
 
+    req.session.admin = true;
+
     return res.json({ success: true, redirectUrl: '/admin/dashboard' });
 };
 
 
 
 export const logoutAdmin = (req, res) => {
+    delete req.session.admin;
     res.redirect('/admin');
+};
+
+export const renderAdminDashboard = async (req, res) => {
+    res.render('admin/adminDashboard');
 };

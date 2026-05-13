@@ -60,7 +60,7 @@ function closeGame() {
 }
 
 // ---------------- WORD SEARCH LOGIC ---------------- //
-const wsSize = 12;
+let wsSize = 12;
 let wsGrid = [];
 let wsSelectedWords = [];
 let wsFoundWords = 0;
@@ -72,6 +72,10 @@ function initWordSearch() {
     const allWords = getAllWords().sort(() => 0.5 - Math.random());
     wsSelectedWords = allWords.slice(0, 6).map(w => ({...w, found: false}));
     wsFoundWords = 0;
+    
+    // Dynamically calculate grid size based on the longest word
+    const longestWordLen = Math.max(...wsSelectedWords.map(w => w.word.length));
+    wsSize = Math.max(longestWordLen + 1, 8); // Compact layout but enough room to place intersecting words
     
     // Create empty grid
     wsGrid = Array(wsSize).fill(null).map(() => Array(wsSize).fill(''));
@@ -129,7 +133,7 @@ function initWordSearch() {
 
 function renderWordSearch() {
     const gridEl = document.getElementById('wsGrid');
-    gridEl.style.gridTemplateColumns = `repeat(${wsSize}, 35px)`;
+    gridEl.style.gridTemplateColumns = `repeat(${wsSize}, 32px)`;
     gridEl.innerHTML = '';
     
     for (let y = 0; y < wsSize; y++) {
@@ -374,7 +378,7 @@ function placeWord(word, clue, x, y, dir) {
 
 function renderCrossword() {
     const gridEl = document.getElementById('cwGrid');
-    gridEl.style.gridTemplateColumns = `repeat(${cwSize}, 35px)`;
+    gridEl.style.gridTemplateColumns = `repeat(${cwSize}, 32px)`;
     gridEl.innerHTML = '';
     
     for (let y = 0; y < cwSize; y++) {
@@ -538,7 +542,8 @@ function checkCrossword() {
             w.solved = true;
             document.getElementById(`clue-${w.id}`).classList.add('solved-clue');
             cells.forEach(c => {
-                c.style.backgroundColor = '#d4edda'; // light green success
+                c.style.backgroundColor = 'rgba(168, 218, 236, 0.3)'; // soft cyan success
+                c.style.borderColor = 'rgba(168, 218, 236, 0.5)';
             });
         } else {
             w.solved = false;

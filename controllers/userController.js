@@ -40,7 +40,7 @@ export const signupUser = async (req, res) => {
     if (existingUsername) {
         return res.status(409).json({
             success: false,
-            errors: { username: 'Username not available' }
+            errors: { username: 'Username is not available' }
         });
     }
 
@@ -48,7 +48,7 @@ export const signupUser = async (req, res) => {
     if (existingEmail) {
         return res.status(409).json({
             success: false,
-            errors: { email: 'Email not available' }
+            errors: { email: 'Email is not available' }
         });
     }
 
@@ -63,12 +63,11 @@ export const loginUser = async (req, res) => {
     const user = await User.findOne({ username });
 
     if (!user) {
-        return res.status(401).json({ success: false, message: 'User not found' });
+        return res.status(401).json({ success: false, field: 'username', message: 'Invalid username' });
     }
-    
 
     if (user.password !== password) {
-        return res.status(401).json({ success: false, message: 'Incorrect password' });
+        return res.status(401).json({ success: false, field: 'password', message: 'Incorrect password' });
     }
 
     req.session.user = user;

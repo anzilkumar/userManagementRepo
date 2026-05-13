@@ -4,6 +4,7 @@ import session from 'express-session';
 import userRoute from './routes/userRoute.js';
 import adminRoute from './routes/adminRoute.js';
 import { attachUser } from './middlewares/authMiddleware.js';
+import { attachAdmin } from './middlewares/adminAuthMiddleware.js';
 
 const app = express();
 
@@ -20,9 +21,7 @@ app.use(session({
     cookie: { httpOnly: true, maxAge: 1000 * 60 * 60 * 24 }
 }));
 
-app.use(attachUser);
-
-app.use('/', userRoute);
-app.use('/admin', adminRoute);
+app.use('/', attachUser, userRoute);
+app.use('/admin', attachAdmin, adminRoute);
 
 export default app;

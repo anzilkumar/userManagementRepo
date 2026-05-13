@@ -46,38 +46,51 @@
 
             <!-- Word Search Area -->
             <div id="wordSearchArea" class="game-area" style="display: none;">
-                <button class="back-btn" onclick="closeGame()"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                <h2>Word Search</h2>
-                <p style="margin-bottom: 20px; color: #b5e1ef;">Drag to select words. They can be horizontal, vertical, or diagonal (forwards or backwards).</p>
-                <div class="word-search-container">
-                    <div id="wsGrid" class="ws-grid"></div>
-                    <div class="ws-words">
-                        <h3>Words to find:</h3>
-                        <ul id="wsWordList"></ul>
-                        <button class="action-btn" onclick="initWordSearch()">Restart Game</button>
+                <div class="game-layout">
+                    <div class="center-game-area">
+                        <div class="game-header">
+                            <button class="back-btn" onclick="closeGame()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <div class="timer">3:00</div>
+                        </div>
+                        <div class="grid-wrapper">
+                            <div id="wsGrid" class="ws-grid"></div>
+                        </div>
+                    </div>
+                    <div class="right-panel">
+                        <div class="panel-header">
+                            <h3>Questions</h3>
+                            <span class="points">Points : 0/60</span>
+                        </div>
+                        <ul id="wsWordList" class="question-list"></ul>
+                        <button class="action-btn" onclick="initWordSearch()" style="margin-top: auto;">Restart Game</button>
                     </div>
                 </div>
             </div>
 
             <!-- Crossword Area -->
             <div id="crosswordArea" class="game-area" style="display: none;">
-                <button class="back-btn" onclick="closeGame()"><i class="fa-solid fa-arrow-left"></i> Back</button>
-                <h2>Crossword</h2>
-                <p style="margin-bottom: 20px; color: #b5e1ef;">Click a cell and type. Navigation is constrained to the active word direction.</p>
-                <div class="crossword-container">
-                    <div class="cw-grid-wrapper">
-                        <div id="cwGrid" class="cw-grid"></div>
+                <div class="game-layout">
+                    <div class="center-game-area">
+                        <div class="game-header">
+                            <button class="back-btn" onclick="closeGame()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                            <div class="timer">3:00</div>
+                        </div>
+                        <div class="grid-wrapper">
+                            <div id="cwGrid" class="cw-grid"></div>
+                        </div>
                     </div>
-                    <div class="cw-clues">
-                        <div class="clues-across">
-                            <h3>Across</h3>
-                            <ul id="cwAcrossClues"></ul>
+                    <div class="right-panel">
+                        <div class="panel-header">
+                            <h3>Questions</h3>
+                            <span class="points">Points : 0/60</span>
                         </div>
-                        <div class="clues-down">
-                            <h3>Down</h3>
-                            <ul id="cwDownClues"></ul>
+                        <div class="clues-section">
+                            <h4>Across</h4>
+                            <ul id="cwAcrossClues" class="question-list"></ul>
+                            <h4 style="margin-top:15px;">Down</h4>
+                            <ul id="cwDownClues" class="question-list"></ul>
                         </div>
-                        <button class="action-btn" onclick="initCrossword()" style="margin-top: 20px;">Restart Game</button>
+                        <button class="action-btn" onclick="initCrossword()" style="margin-top: auto;">Restart Game</button>
                     </div>
                 </div>
             </div>
