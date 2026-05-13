@@ -6,6 +6,383 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="/css/adminStyle.css">
+    <style>
+        .search-filter-form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            align-items: center;
+            flex-wrap: wrap;
+            background: rgba(20, 60, 85, 0.4);
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .search-group {
+            display: flex;
+            flex-grow: 1;
+            gap: 8px;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .search-input-wrapper {
+            flex-grow: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        .search-input-wrapper input {
+            width: 100%;
+            padding: 10px 15px 10px 35px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background-color: rgba(15, 30, 45, 0.7);
+            color: #f8fafc;
+            outline: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .search-input-wrapper input::placeholder {
+            color: #94a3b8;
+        }
+        .search-input-wrapper input:focus {
+            border-color: #3498DB;
+            background-color: rgba(20, 40, 60, 0.85);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .search-input-wrapper svg {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            fill: #94a3b8;
+            pointer-events: none;
+        }
+        .custom-dropdown {
+            position: relative;
+            min-width: 150px;
+            user-select: none;
+        }
+        .dropdown-selected {
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background-color: rgba(11, 44, 61, 0.6);
+            color: #f8fafc;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        .dropdown-selected svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s ease;
+        }
+        .custom-dropdown.open .dropdown-selected {
+            border-color: #3498DB;
+            background-color: rgba(20, 60, 85, 0.8);
+        }
+        .custom-dropdown.open .dropdown-selected svg {
+            transform: rotate(180deg);
+        }
+        .dropdown-options {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            right: 0;
+            background-color: rgba(20, 60, 85, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+            overflow: hidden;
+        }
+        .custom-dropdown.open .dropdown-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .dropdown-option {
+            padding: 10px 15px;
+            color: #cbd5e1;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .dropdown-option:hover {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: #f8fafc;
+        }
+        .dropdown-option.selected {
+            background-color: rgba(52, 152, 219, 0.4);
+            color: #fff;
+            font-weight: 600;
+        }
+        .search-filter-form button {
+            margin-top: 0;
+            padding: 9px 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            border: 1px solid transparent;
+        }
+        .search-primary-btn {
+            background-color: #3498DB !important;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+        }
+        .search-primary-btn:hover {
+            background-color: #2980B9 !important;
+            box-shadow: 0 6px 16px rgba(41, 128, 185, 0.5);
+        }
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            gap: 8px;
+            background-color: rgba(11, 44, 61, 0.4);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0 0 8px 8px;
+        }
+        .pagination-container:empty {
+            display: none;
+        }
+        .page-btn {
+            background: rgba(20, 60, 85, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #f8fafc;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        .page-btn:hover:not(.disabled):not(.active) {
+            background: #3498DB;
+            border-color: #3498DB;
+        }
+        .page-btn.active {
+            background: #3498DB;
+            border-color: #3498DB;
+            cursor: default;
+        }
+        .page-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .avatar-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .game-access-btn {
+            padding: 5px 8px;
+            font-size: 12px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .game-access-btn.disabled-game {
+            background: #475569;
+        }
+        .game-access-btn.disabled-game:hover {
+            background: #64748b;
+        }
+        .users-table th, .users-table td {
+            vertical-align: middle;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(11, 44, 61, 0.7);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: rgba(20, 60, 85, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+        .modal-title {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(11, 44, 61, 0.6);
+            color: #fff;
+            outline: none;
+            margin-top: 5px;
+        }
+        .modal-input:focus {
+            border-color: #3498DB;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-cancel {
+            background: #475569;
+            color: #fff;
+        }
+        .btn-cancel:hover { background: #64748b; }
+        .btn-save {
+            background: #3498DB;
+            color: #fff;
+        }
+        .btn-save:hover { background: #2980B9; }
+        .error-msg {
+            color: #ff6b6b;
+            font-size: 13px;
+            margin-top: 5px;
+            min-height: 18px;
+        }
+        .edit-action-btn {
+            background: #10b981;
+        }
+        .edit-action-btn:hover {
+            background: #059669;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(11, 44, 61, 0.7);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: rgba(20, 60, 85, 0.95);
+            padding: 24px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 340px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+        .modal-title {
+            color: #fff;
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(11, 44, 61, 0.6);
+            color: #fff;
+            outline: none;
+            margin-top: 5px;
+        }
+        .modal-input:focus {
+            border-color: #3498DB;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-cancel {
+            background: #475569;
+            color: #fff;
+        }
+        .btn-cancel:hover { background: #64748b; }
+        .btn-save {
+            background: #3498DB;
+            color: #fff;
+        }
+        .btn-save:hover { background: #2980B9; }
+        .error-msg {
+            color: #ff6b6b;
+            font-size: 13px;
+            margin-top: 5px;
+            min-height: 18px;
+        }
+        .edit-action-btn {
+            background: #10b981;
+        }
+        .edit-action-btn:hover {
+            background: #059669;
+        }
+    </style>
 </head>
 
 <body class="dashboard-page">
@@ -19,28 +396,79 @@
             <a class="logout-link" href="/admin/logout">Logout</a>
         </header>
 
+        <form id="searchFilterForm" class="search-filter-form" onsubmit="return false;">
+            <div class="search-group">
+                <div class="search-input-wrapper">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <input type="text" id="searchInput" name="search" placeholder="Search users by name or email..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+                </div>
+                <button type="button" id="searchBtn" class="submit-btn search-primary-btn">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    Search
+                </button>
+            </div>
+            
+            <div class="filter-group">
+                <div class="custom-dropdown" id="filterDropdown">
+                    <div class="dropdown-selected" id="filterSelected">
+                        <span><%= (typeof filter === 'undefined' || filter === 'all') ? 'All' : (filter === 'blocked' ? 'Blocked' : 'Active') %></span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="dropdown-options" id="filterOptions">
+                        <div class="dropdown-option <%= (!filter || filter === 'all') ? 'selected' : '' %>" data-value="all">All</div>
+                        <div class="dropdown-option <%= (filter === 'active') ? 'selected' : '' %>" data-value="active">Active</div>
+                        <div class="dropdown-option <%= (filter === 'blocked') ? 'selected' : '' %>" data-value="blocked">Blocked</div>
+                    </div>
+                    <input type="hidden" id="filterSelect" name="filter" value="<%= (typeof filter === 'undefined' || filter === 'all') ? 'all' : filter %>">
+                </div>
+                <div class="custom-dropdown" id="sortDropdown">
+                    <div class="dropdown-selected" id="sortSelected">
+                        <span><%= (typeof sort !== 'undefined' && sort === 'alphabetical') ? 'Alphabetical' : 'Latest' %></span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <div class="dropdown-options" id="sortOptions">
+                        <div class="dropdown-option <%= (!sort || sort === 'latest') ? 'selected' : '' %>" data-value="latest">Latest</div>
+                        <div class="dropdown-option <%= (sort === 'alphabetical') ? 'selected' : '' %>" data-value="alphabetical">Alphabetical</div>
+                    </div>
+                    <input type="hidden" id="sortSelect" name="sort" value="<%= (typeof sort !== 'undefined' && sort === 'alphabetical') ? 'alphabetical' : 'latest' %>">
+                </div>
+                <button type="button" id="resetBtn" class="submit-btn" style="background: #475569;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                    Reset
+                </button>
+            </div>
+        </form>
+
         <section class="users-panel">
             <h2>User moderation</h2>
             <table class="users-table">
                 <thead>
                     <tr>
-                        <th>No</th>
+                        <th>Avatar</th>
                         <th>Username</th>
                         <th>Email</th>
                         <th>Status</th>
+                        <th>Game Access</th>
+                        <th>Joined</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="usersTableBody">
                     <% if (users.length === 0) { %>
                         <tr>
-                            <td colspan="5" class="empty-users">No users found</td>
+                            <td colspan="7" class="empty-users">No users found</td>
                         </tr>
                     <% } %>
 
                     <% users.forEach((user, index) => { %>
                         <tr data-user-row="<%= user._id %>">
-                            <td><%= index + 1 %></td>
+                            <td>
+                                <% if (user.profileImage) { %>
+                                    <img src="<%= user.profileImage %>" alt="avatar" class="avatar-img">
+                                <% } else { %>
+                                    <img src="/img/avatar.png" alt="avatar" class="avatar-img" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%23cbd5e1%22><path d=%22M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z%22/></svg>'">
+                                <% } %>
+                            </td>
                             <td><%= user.username %></td>
                             <td><%= user.email %></td>
                             <td>
@@ -48,17 +476,90 @@
                                     <%= user.isBlocked ? 'Blocked' : 'Active' %>
                                 </span>
                             </td>
+                            <td>
+                                <% const wsAccess = user.gameAccess?.wordSearch ?? true; %>
+                                <% const cwAccess = user.gameAccess?.crossword ?? true; %>
+                                <button class="admin-action game-access-btn <%= wsAccess ? '' : 'disabled-game' %>" data-action="toggle-game" data-game="wordSearch" data-user-id="<%= user._id %>" type="button" title="Toggle Word Search">
+                                    WS: <%= wsAccess ? 'ON' : 'OFF' %>
+                                </button>
+                                <button class="admin-action game-access-btn <%= cwAccess ? '' : 'disabled-game' %>" data-action="toggle-game" data-game="crossword" data-user-id="<%= user._id %>" type="button" title="Toggle Crossword">
+                                    CW: <%= cwAccess ? 'ON' : 'OFF' %>
+                                </button>
+                            </td>
+                            <td><%= new Date(user.createdAt).toLocaleDateString('en-GB') %></td>
                             <td class="actions-cell">
+                                <button class="admin-action edit-action-btn edit-user-btn" data-id="<%= user._id %>" data-username="<%= user.username %>" data-email="<%= user.email %>" type="button" style="display:flex; align-items:center; gap:4px;" title="Edit User">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    Edit
+                                </button>
                                 <button class="admin-action" data-action="block" data-user-id="<%= user._id %>" type="button">
                                     <%= user.isBlocked ? 'Unblock' : 'Block' %>
+                                </button>
+                                <button class="admin-action danger-button" data-action="delete" data-user-id="<%= user._id %>" type="button">
+                                    Delete
                                 </button>
                             </td>
                         </tr>
                     <% }) %>
                 </tbody>
             </table>
+            <div class="pagination-container" id="paginationContainer">
+                <% if (totalPages > 1) { %>
+                    <button class="page-btn <%= currentPage === 1 ? 'disabled' : '' %>" data-page="<%= currentPage - 1 %>">Prev</button>
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <button class="page-btn <%= currentPage === i ? 'active' : '' %>" data-page="<%= i %>"><%= i %></button>
+                    <% } %>
+                    <button class="page-btn <%= currentPage === totalPages ? 'disabled' : '' %>" data-page="<%= currentPage + 1 %>">Next</button>
+                <% } %>
+            </div>
         </section>
     </main>
+
+    <div id="editUserModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">Edit User</h2>
+            <form id="editUserForm" onsubmit="return false;">
+                <input type="hidden" id="editUserId">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="editUsername" style="color: #cbd5e1; font-size: 13px;">Username</label>
+                    <input type="text" id="editUsername" name="username" class="modal-input" required>
+                    <div id="editUsernameError" class="error-msg"></div>
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="editEmail" style="color: #cbd5e1; font-size: 13px;">Email</label>
+                    <input type="email" id="editEmail" name="email" class="modal-input" required>
+                    <div id="editEmailError" class="error-msg"></div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelEditBtn">Cancel</button>
+                    <button type="submit" class="btn btn-save" id="saveEditBtn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="editUserModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="modal-title">Edit User</h2>
+            <form id="editUserForm" onsubmit="return false;">
+                <input type="hidden" id="editUserId">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="editUsername" style="color: #cbd5e1; font-size: 13px; font-weight: 600;">Username</label>
+                    <input type="text" id="editUsername" name="username" class="modal-input" required>
+                    <div id="editUsernameError" class="error-msg"></div>
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="editEmail" style="color: #cbd5e1; font-size: 13px; font-weight: 600;">Email</label>
+                    <input type="email" id="editEmail" name="email" class="modal-input" required>
+                    <div id="editEmailError" class="error-msg"></div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" id="cancelEditBtn">Cancel</button>
+                    <button type="submit" class="btn btn-save" id="saveEditBtn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="/js/adminDashboard.js"></script>
 </body>

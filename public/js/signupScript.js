@@ -52,9 +52,12 @@ const getEmailError = (email) => {
 
 const getPasswordError = (password, showRequired = true) => {
     if (!password) return showRequired ? 'Please enter password' : '';
-    if (password.length < 6) return 'Password must contain at least 6 characters';
+    if (password.length < 8) return 'Password must contain at least 8 characters';
+    if (/\s/.test(password)) return 'Password cannot contain spaces';
+    if (!/[A-Z]/.test(password)) return 'Password must contain at least one uppercase letter';
+    if (!/[a-z]/.test(password)) return 'Password must contain at least one lowercase letter';
     if (!/\d/.test(password)) return 'Password must contain at least one number';
-    if (!/[^A-Za-z0-9]/.test(password)) return 'Password must contain at least one special character';
+    if (!/[^A-Za-z0-9\s]/.test(password)) return 'Password must contain at least one special character';
     return '';
 };
 

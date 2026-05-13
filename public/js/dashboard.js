@@ -44,6 +44,15 @@ function getAllWords() {
 let timerInterval;
 
 function openGame(gameId) {
+    if (gameId === 'wordSearch' && userData.gameAccess && userData.gameAccess.wordSearch === false) {
+        alert("You do not have access to Word Search. Please contact the administrator.");
+        return;
+    }
+    if (gameId === 'crossword' && userData.gameAccess && userData.gameAccess.crossword === false) {
+        alert("You do not have access to Crossword. Please contact the administrator.");
+        return;
+    }
+
     document.getElementById('dashboardHome').style.display = 'none';
     if(gameId === 'wordSearch') {
         document.getElementById('wordSearchArea').style.display = 'block';

@@ -35,6 +35,16 @@ export const getQuestions = async (req, res) => {
 };
 
 export const startGame = async (req, res) => {
+    const { gameType } = req.body;
+    const userAccess = req.user.gameAccess || { wordSearch: true, crossword: true };
+    
+    if (gameType === 'word-search' && userAccess.wordSearch === false) {
+         return res.status(403).json({ success: false, message: 'You do not have access to Word Search.' });
+    }
+    if (gameType === 'crossword' && userAccess.crossword === false) {
+         return res.status(403).json({ success: false, message: 'You do not have access to Crossword.' });
+    }
+
     const session = await startGameSession({
         userId: req.user._id,
         topic: req.body.topic,

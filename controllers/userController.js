@@ -18,7 +18,8 @@ export const renderHome = async (req, res) => {
         id: req.user._id,
         username: req.user.username,
         email: req.user.email,
-        profileImage: req.user.profileImage
+        profileImage: req.user.profileImage,
+        gameAccess: req.user.gameAccess || { wordSearch: true, crossword: true }
     };
 
     res.render('user/home', {
@@ -35,6 +36,13 @@ export const logoutUser = (req, res) => {
 
 export const signupUser = async (req, res) => {
     const { username, email, password } = req.body;
+
+    if (!password || password.length < 8 || /\s/.test(password) || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password) || !/[^A-Za-z0-9\s]/.test(password)) {
+        return res.status(400).json({
+            success: false,
+            errors: { password: 'Password does not meet the requirements' }
+        });
+    }
 
     const existingUsername = await User.findOne({ username }).lean();
     if (existingUsername) {
@@ -64,6 +72,10 @@ export const loginUser = async (req, res) => {
 
     if (!user) {
         return res.status(401).json({ success: false, field: 'username', message: 'Invalid username' });
+    }
+
+    if (user.isBlocked) {
+        return res.status(403).json({ success: false, field: 'username', message: 'Your account has been blocked' });
     }
 
     if (user.password !== password) {

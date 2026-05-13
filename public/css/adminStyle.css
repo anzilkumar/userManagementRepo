@@ -199,8 +199,10 @@ body.dashboard-page {
 
 .users-panel h2 {
     color: #ffffff;
-    font-size: 18px;
-    padding: 18px 16px 0;
+    font-size: 19px;
+    font-weight: 600;
+    padding: 22px 24px;
+    letter-spacing: 0.5px;
 }
 
 .users-table {

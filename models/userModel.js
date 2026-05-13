@@ -59,6 +59,10 @@ const userSchema = new mongoose.Schema({
     blockedAt: {
         type: Date,
         default: null
+    },
+    gameAccess: {
+        wordSearch: { type: Boolean, default: true },
+        crossword: { type: Boolean, default: true }
     }
 }, { timestamps: true });
 
