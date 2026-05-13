@@ -1,0 +1,77 @@
+import User from '../models/userModel.js';
+
+const invalidLoginResponse = () => ({
+    success: false,
+    message: 'Invalid username or password'
+});
+
+export const renderLogin = (req, res) => {
+    res.render('user/user');
+};
+
+export const renderSignup = (req, res) => {
+    res.render('user/signup');
+};
+
+export const renderHome = async (req, res) => {
+    const viewUser = {
+        id: req.user._id,
+        username: req.user.username,
+        email: req.user.email,
+        profileImage: req.user.profileImage
+    };
+
+    res.render('user/home', {
+        user: viewUser,
+        userJson: JSON.stringify(viewUser).replace(/</g, '\\u003c')
+    });
+};
+
+export const logoutUser = (req, res) => {
+    req.session.destroy(() => {
+        res.redirect('/');
+    });
+};
+
+export const signupUser = async (req, res) => {
+    const { username, email, password } = req.body;
+
+    const existingUsername = await User.findOne({ username }).lean();
+    if (existingUsername) {
+        return res.status(409).json({
+            success: false,
+            errors: { username: 'Username not available' }
+        });
+    }
+
+    const existingEmail = await User.findOne({ email }).lean();
+    if (existingEmail) {
+        return res.status(409).json({
+            success: false,
+            errors: { email: 'Email not available' }
+        });
+    }
+
+    await User.create({ username, email, password });
+
+    return res.status(201).json({ success: true, redirectUrl: '/' });
+};
+
+export const loginUser = async (req, res) => {
+    const { username, password } = req.body;
+
+    const user = await User.findOne({ username });
+
+    if (!user) {
+        return res.status(401).json({ success: false, message: 'User not found' });
+    }
+    
+
+    if (user.password !== password) {
+        return res.status(401).json({ success: false, message: 'Incorrect password' });
+    }
+
+    req.session.user = user;
+
+    return res.json({ success: true, redirectUrl: '/home' });
+};

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/adminStyle.css">
+</head>
+
+<body class="dashboard-page">
+    <main class="dashboard-wrapper">
+        <header class="dashboard-header">
+            <div>
+                <h1>Admin Dashboard</h1>
+                <p>Registered users</p>
+            </div>
+
+            <a class="logout-link" href="/admin/logout">Logout</a>
+        </header>
+
+        <section class="users-panel">
+            <h2>User moderation</h2>
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (users.length === 0) { %>
+                        <tr>
+                            <td colspan="5" class="empty-users">No users found</td>
+                        </tr>
+                    <% } %>
+
+                    <% users.forEach((user, index) => { %>
+                        <tr data-user-row="<%= user._id %>">
+                            <td><%= index + 1 %></td>
+                            <td><%= user.username %></td>
+                            <td><%= user.email %></td>
+                            <td>
+                                <span class="status-pill <%= user.isBlocked ? 'danger' : 'ok' %>">
+                                    <%= user.isBlocked ? 'Blocked' : 'Active' %>
+                                </span>
+                            </td>
+                            <td class="actions-cell">
+                                <button class="admin-action" data-action="block" data-user-id="<%= user._id %>" type="button">
+                                    <%= user.isBlocked ? 'Unblock' : 'Block' %>
+                                </button>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script src="/js/adminDashboard.js"></script>
+</body>
+
+</html>

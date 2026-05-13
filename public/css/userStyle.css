@@ -1,0 +1,149 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    background-size: cover;
+    justify-content: center;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url('img/background.jpg');
+}
+
+.login-wrapper {
+    width: 100%;
+    margin: 20px;
+    max-width: 450px;
+    padding: 40px 35px;
+    border-radius: 12px;
+    backdrop-filter: blur(5px);
+    background-color: #318AA356; 
+    -webkit-backdrop-filter: blur(5px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.login-form {
+    gap: 22px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    gap: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+}
+
+.form-group input {
+    width: 100%;
+    outline: none;
+    color: #333;
+    font-size: 15px;
+    padding: 12px 15px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.95);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #ffffff;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.password-input-container {
+    display: flex;
+    position: relative;
+    align-items: center;
+}
+
+.password-input-container input {
+    padding-right: 45px;
+}
+
+.password-input-container i {
+    right: 15px;
+    display: flex;
+    color: #666;
+    font-size: 16px;
+    cursor: pointer;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
+}
+
+.password-input-container i.custom-slash::after {
+    width: 90%;
+    content: '';
+    height: 1.5px;
+    border-radius: 2px;
+    position: absolute;
+    transform: rotate(-45deg);
+    background-color: currentColor;
+    box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.95);
+}
+
+.password-input-container i:hover {
+    color: #333;
+}
+
+.submit-btn {
+    border: none;
+    padding: 14px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-weight: 700;
+    color: #ffffff;
+    border-radius: 6px;
+    background-color: #195e74;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.submit-btn:hover {
+    background-color: #124555;
+}
+
+.submit-btn:active {
+    transform: scale(0.98);
+}
+
+.signup-link {
+    margin-top: 5px;
+    font-size: 14px;
+    color: #e0e0e0;
+    text-align: center;
+}
+
+.signup-link a {
+    font-weight: 600;
+    margin-left: 5px;
+    color: #ffffff;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.signup-link a:hover {
+    color: #b5e1ef;
+}
+
+@media (max-width: 480px) {
+    .login-wrapper {
+        padding: 30px 20px;
+    }
+}

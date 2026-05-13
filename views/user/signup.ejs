@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignUp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/signupStyle.css">
+</head>
+
+<body>
+    <div class="signup-wrapper">
+        <form class="signup-form" action="/signup" method="POST" novalidate>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div class="error-message" id="usernameError"></div>
+                <input type="text" name="username" id="username" placeholder="Choose a username">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <div class="error-message" id="emailError"></div>
+                <input type="email" name="email" id="email" placeholder="Enter your email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="error-message" id="passwordError"></div>
+
+                <div class="password-input-container">
+                    <input type="password" name="password" id="password" placeholder="Create a password">
+                    <i class="fa-regular fa-eye toggle-password" data-target="password"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <div class="error-message" id="confirmPasswordError"></div>
+
+                <div class="password-input-container">
+                    <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm your password">
+                    <i class="fa-regular fa-eye toggle-password" data-target="confirmPassword"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Sign Up</button>
+
+            <div class="login-link">
+                <p>Already have an account? <a href="/">Login</a></p>
+            </div>
+        </form>
+    </div>
+
+    <script src="/js/signupScript.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/adminStyle.css">
+</head>
+
+<body>
+    <div class="admin-wrapper">
+        <div class="admin-header">
+            <h2>Admin Portal</h2>
+            <p>Sign in to continue</p>
+        </div>
+
+        <form class="admin-form" action="/admin/login" method="POST">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div id="usernameError" style="color: #ff0000; font-size: 14px; margin-bottom: 5px; font-weight: 500;"></div>
+                <input type="text" name="username" id="username" placeholder="Enter admin username">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div id="passwordError" style="color: #ff0000; font-size: 14px; margin-bottom: 5px; font-weight: 500;"></div>
+
+                <div class="password-input-container">
+                    <input type="password" name="password" id="password" placeholder="Enter your password">
+                    <i class="fa-regular fa-eye" id="togglePassword"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Sign In</button>
+        </form>
+    </div>
+
+    <script src="/js/adminScript.js"></script>
+</body>
+
+</html>
