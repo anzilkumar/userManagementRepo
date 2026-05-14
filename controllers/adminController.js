@@ -149,25 +149,40 @@ export const deleteUser = async (req, res) => {
 export const editUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const { username, email } = req.body;
+        const username = (req.body.username || '').trim().toLowerCase();
+        const email = (req.body.email || '').trim().toLowerCase();
 
         const user = await User.findById(id);
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
+        const errors = {};
+
+        if (username === ADMIN_USERNAME) {
+            errors.username = 'This username is reserved and cannot be used';
+        }
+
+        if (email === ADMIN_EMAIL) {
+            errors.email = 'This email is reserved and cannot be used';
+        }
+
+        if (Object.keys(errors).length > 0) {
+            return res.status(409).json({ success: false, errors });
+        }
+
         if (username && username !== user.username) {
-            const existingUsername = await User.findOne({ username }).lean();
+            const existingUsername = await User.findOne({ username, _id: { $ne: id } }).lean();
             if (existingUsername) {
-                return res.status(409).json({ success: false, errors: { username: 'Username is not available' } });
+                return res.status(409).json({ success: false, errors: { username: 'This username is already taken' } });
             }
             user.username = username;
         }
 
         if (email && email !== user.email) {
-            const existingEmail = await User.findOne({ email }).lean();
+            const existingEmail = await User.findOne({ email, _id: { $ne: id } }).lean();
             if (existingEmail) {
-                return res.status(409).json({ success: false, errors: { email: 'Email is not available' } });
+                return res.status(409).json({ success: false, errors: { email: 'This email is already registered' } });
             }
             user.email = email;
         }

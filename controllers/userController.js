@@ -13,6 +13,27 @@ export const renderSignup = (req, res) => {
     res.render('user/signup');
 };
 
+export const checkSignupAvailability = async (req, res) => {
+    const field = req.query.field;
+    const value = (req.query.value || '').trim();
+
+    if (!['username', 'email'].includes(field) || !value) {
+        return res.status(400).json({ success: false, message: 'Invalid availability check' });
+    }
+
+    const queryValue = field === 'email' ? value.toLowerCase() : value;
+    const existingUser = await User.findOne({ [field]: queryValue }).lean();
+
+    return res.json({
+        success: true,
+        available: !existingUser,
+        field,
+        message: existingUser
+            ? (field === 'username' ? 'Username is already taken' : 'This email is already registered')
+            : ''
+    });
+};
+
 export const renderHome = async (req, res) => {
     const viewUser = {
         id: req.user._id,
@@ -48,7 +69,7 @@ export const signupUser = async (req, res) => {
     if (existingUsername) {
         return res.status(409).json({
             success: false,
-            errors: { username: 'Username is not available' }
+            errors: { username: 'Username is already taken' }
         });
     }
 
@@ -56,7 +77,7 @@ export const signupUser = async (req, res) => {
     if (existingEmail) {
         return res.status(409).json({
             success: false,
-            errors: { email: 'Email is not available' }
+            errors: { email: 'This email is already registered' }
         });
     }
 
@@ -67,19 +88,25 @@ export const signupUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
     const { username, password } = req.body;
+    const loginIdentifier = (username || '').trim();
 
-    const user = await User.findOne({ username });
+    const user = await User.findOne({
+        $or: [
+            { username: loginIdentifier },
+            { email: loginIdentifier.toLowerCase() }
+        ]
+    });
 
     if (!user) {
-        return res.status(401).json({ success: false, field: 'username', message: 'Invalid username' });
-    }
-
-    if (user.isBlocked) {
-        return res.status(403).json({ success: false, field: 'username', message: 'Your account has been blocked' });
+        return res.status(401).json({ success: false, field: 'username', message: 'User not found' });
     }
 
     if (user.password !== password) {
         return res.status(401).json({ success: false, field: 'password', message: 'Incorrect password' });
+    }
+
+    if (user.isBlocked) {
+        return res.status(403).json({ success: false, field: 'username', message: 'Your account has been blocked' });
     }
 
     req.session.user = user;

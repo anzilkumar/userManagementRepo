@@ -264,9 +264,23 @@ body.dashboard-page {
 }
 
 .actions-cell {
-    gap: 8px;
     display: flex;
-    flex-wrap: wrap;
+    gap: 6px;
+    flex-wrap: nowrap;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.actions-cell .admin-action {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 9px;
+}
+
+.actions-cell .admin-action[data-action="block"] {
+    width: 72px;
 }
 
 .admin-action {

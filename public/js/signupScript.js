@@ -8,6 +8,18 @@ const passwordInput = document.querySelector('#password');
 const confirmPasswordError = document.querySelector('#confirmPasswordError');
 const confirmPasswordInput = document.querySelector('#confirmPassword');
 const togglePasswords = document.querySelectorAll('.toggle-password');
+const availabilityMessages = {
+    username: 'Username is already taken',
+    email: 'This email is already registered'
+};
+const availabilityState = {
+    username: { value: '', available: null, controller: null },
+    email: { value: '', available: null, controller: null }
+};
+const availabilityTimers = {
+    username: null,
+    email: null
+};
 
 const setError = (field, message) => {
     const errorElement = {
@@ -46,8 +58,71 @@ const getEmailError = (email) => {
     const emailRegex = /^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 
     if (!email) return 'Please enter email address';
-    if (/\s/.test(email) || !emailRegex.test(email)) return 'Please enter a valid email address';
+    if (/\s/.test(email) || !emailRegex.test(email)) return 'Invalid email format';
     return '';
+};
+
+const resetAvailability = (field) => {
+    availabilityState[field].value = '';
+    availabilityState[field].available = null;
+    availabilityState[field].controller?.abort();
+    availabilityState[field].controller = null;
+    clearTimeout(availabilityTimers[field]);
+};
+
+const checkAvailability = async (field, value) => {
+    availabilityState[field].controller?.abort();
+
+    const controller = new AbortController();
+    availabilityState[field].controller = controller;
+    availabilityState[field].value = value;
+    availabilityState[field].available = null;
+
+    try {
+        const response = await fetch(`/signup/check?field=${encodeURIComponent(field)}&value=${encodeURIComponent(value)}`, {
+            signal: controller.signal
+        });
+        const data = await response.json();
+
+        if (availabilityState[field].value !== value) return null;
+
+        availabilityState[field].available = Boolean(data.success && data.available);
+
+        if (!availabilityState[field].available) {
+            setError(field, data.message || availabilityMessages[field]);
+            return false;
+        }
+
+        setError(field, '');
+        return true;
+    } catch (error) {
+        if (error.name !== 'AbortError') {
+            console.error(`${field} availability check failed:`, error);
+        }
+        return null;
+    } finally {
+        if (availabilityState[field].controller === controller) {
+            availabilityState[field].controller = null;
+        }
+    }
+};
+
+const scheduleAvailabilityCheck = (field, value) => {
+    clearTimeout(availabilityTimers[field]);
+    availabilityTimers[field] = setTimeout(() => {
+        checkAvailability(field, value);
+    }, 450);
+};
+
+const ensureAvailability = async (field, value) => {
+    const cached = availabilityState[field];
+
+    if (cached.value === value && cached.available !== null) {
+        if (!cached.available) setError(field, availabilityMessages[field]);
+        return cached.available;
+    }
+
+    return await checkAvailability(field, value);
 };
 
 const getPasswordError = (password, showRequired = true) => {
@@ -76,11 +151,43 @@ const getPasswordErrors = (password, confirmPassword) => {
 };
 
 usernameInput.addEventListener('input', () => {
-    setError('username', getUsernameError(usernameInput.value.trim(), false));
+    const username = usernameInput.value.trim();
+    const usernameValidation = getUsernameError(username, false);
+
+    if (usernameValidation) {
+        resetAvailability('username');
+        setError('username', usernameValidation);
+        return;
+    }
+
+    setError('username', '');
+
+    if (!username) {
+        resetAvailability('username');
+        return;
+    }
+
+    scheduleAvailabilityCheck('username', username);
 });
 
 emailInput.addEventListener('input', () => {
+    const email = emailInput.value.trim().toLowerCase();
+    const emailValidation = email ? getEmailError(email) : '';
+
+    if (emailValidation) {
+        resetAvailability('email');
+        setError('email', emailValidation);
+        return;
+    }
+
     setError('email', '');
+
+    if (!email) {
+        resetAvailability('email');
+        return;
+    }
+
+    scheduleAvailabilityCheck('email', email);
 });
 
 passwordInput.addEventListener('input', () => {
@@ -111,7 +218,7 @@ signupForm.addEventListener('submit', async (event) => {
     clearErrors();
 
     const username = usernameInput.value.trim();
-    const email = emailInput.value.trim();
+    const email = emailInput.value.trim().toLowerCase();
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
 
@@ -126,6 +233,15 @@ signupForm.addEventListener('submit', async (event) => {
 
     if (Object.keys(errors).length > 0) {
         Object.entries(errors).forEach(([field, message]) => setError(field, message));
+        return;
+    }
+
+    const [isUsernameAvailable, isEmailAvailable] = await Promise.all([
+        ensureAvailability('username', username),
+        ensureAvailability('email', email)
+    ]);
+
+    if (isUsernameAvailable === false || isEmailAvailable === false) {
         return;
     }
 

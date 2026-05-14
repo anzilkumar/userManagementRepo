@@ -20,8 +20,13 @@
     const resetBtn = document.getElementById('resetBtn');
     const tbody = document.getElementById('usersTableBody');
     const paginationContainer = document.getElementById('paginationContainer');
+    const deleteUserModal = document.getElementById('deleteUserModal');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
     let currentPage = 1;
+    let pendingDeleteButton = null;
+    let isDeleteSubmitting = false;
 
     const renderTable = (users) => {
         if (!users || users.length === 0) {
@@ -54,7 +59,7 @@
                             CW: ${cwAccess ? 'ON' : 'OFF'}
                         </button>
                     </td>
-                    <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                    <td>${new Date(user.createdAt).toLocaleDateString('en-GB')}</td>
                     <td class="actions-cell">
                         <button class="admin-action edit-action-btn edit-user-btn" data-id="${user._id}" data-username="${user.username}" data-email="${user.email}" type="button" style="display:flex; align-items:center; gap:4px;" title="Edit User">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -184,14 +189,66 @@
         }
     }
 
+    const closeDeleteModal = () => {
+        if (isDeleteSubmitting) return;
+        deleteUserModal?.classList.remove('show');
+        deleteUserModal?.setAttribute('aria-hidden', 'true');
+        pendingDeleteButton = null;
+    };
+
+    const openDeleteModal = (button) => {
+        if (!deleteUserModal || !confirmDeleteBtn) return false;
+        pendingDeleteButton = button;
+        deleteUserModal.classList.add('show');
+        deleteUserModal.setAttribute('aria-hidden', 'false');
+        confirmDeleteBtn.disabled = false;
+        confirmDeleteBtn.textContent = 'Delete';
+        setTimeout(() => confirmDeleteBtn.focus(), 80);
+        return true;
+    };
+
+    cancelDeleteBtn?.addEventListener('click', closeDeleteModal);
+
+    deleteUserModal?.addEventListener('click', (event) => {
+        if (event.target === deleteUserModal) {
+            closeDeleteModal();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && deleteUserModal?.classList.contains('show')) {
+            closeDeleteModal();
+        }
+    });
+
+    confirmDeleteBtn?.addEventListener('click', async () => {
+        if (!pendingDeleteButton || isDeleteSubmitting) return;
+
+        const button = pendingDeleteButton;
+        isDeleteSubmitting = true;
+        button.disabled = true;
+        confirmDeleteBtn.disabled = true;
+        confirmDeleteBtn.textContent = 'Deleting...';
+
+        try {
+            await request(`/admin/users/${button.dataset.userId}`, { method: 'DELETE' });
+            window.location.reload();
+        } catch (error) {
+            button.disabled = false;
+            alert(error.message);
+            isDeleteSubmitting = false;
+            confirmDeleteBtn.disabled = false;
+            confirmDeleteBtn.textContent = 'Delete';
+        }
+    });
+
     document.addEventListener('click', async (event) => {
         const button = event.target.closest('.admin-action');
         if (!button) return;
 
         if (button.dataset.action === 'delete') {
-            if (!confirm('Are you sure you want to permanently delete this user?')) {
-                return;
-            }
+            openDeleteModal(button);
+            return;
         }
 
         button.disabled = true;
@@ -208,12 +265,6 @@
                     method: 'POST',
                     body: JSON.stringify({ game: button.dataset.game })
                 });
-                window.location.reload();
-                return;
-            }
-
-            if (button.dataset.action === 'delete') {
-                await request(`/admin/users/${button.dataset.userId}`, { method: 'DELETE' });
                 window.location.reload();
                 return;
             }
@@ -237,6 +288,53 @@
     const editModal = document.getElementById('editUserModal');
     const editForm = document.getElementById('editUserForm');
     const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const editUsernameInput = document.getElementById('editUsername');
+    const editEmailInput = document.getElementById('editEmail');
+    const editUsernameError = document.getElementById('editUsernameError');
+    const editEmailError = document.getElementById('editEmailError');
+
+    const setEditError = (field, message) => {
+        const errorElement = {
+            username: editUsernameError,
+            email: editEmailError
+        }[field];
+
+        if (errorElement) {
+            errorElement.textContent = message || '';
+        }
+    };
+
+    const getEditUsernameError = (username, showRequired = true) => {
+        if (!username) return showRequired ? 'Please enter username' : '';
+        if (username.toLowerCase() === 'admin') return 'This username is reserved and cannot be used';
+        if (username.length < 3 || username.length > 20) return 'Username must contain 3 to 20 characters';
+        if (/\s/.test(username)) return 'Spaces are not allowed in username';
+        if (!/^[a-z0-9_.]+$/.test(username)) {
+            return 'Use only letters (a-z), numbers (0-9), underscore (_) and dot (.)';
+        }
+        if (username.includes('..')) return "Do not use two dots together like '..'";
+        if (username.startsWith('.')) return "Username cannot start with '.'";
+        if (username.endsWith('.')) return "Username cannot end with '.'";
+        return '';
+    };
+
+    const getEditEmailError = (email) => {
+        const emailRegex = /^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
+        const normalizedEmail = email.toLowerCase();
+
+        if (!email) return 'Please enter email address';
+        if (/\s/.test(email) || !emailRegex.test(email)) return 'Invalid email format';
+        if (normalizedEmail === 'admin@gmail.com') return 'This email is reserved and cannot be used';
+        return '';
+    };
+
+    editUsernameInput?.addEventListener('input', () => {
+        setEditError('username', getEditUsernameError(editUsernameInput.value.trim(), false));
+    });
+
+    editEmailInput?.addEventListener('input', () => {
+        setEditError('email', '');
+    });
     
     document.addEventListener('click', (e) => {
         const editBtn = e.target.closest('.edit-user-btn');
@@ -244,8 +342,8 @@
             document.getElementById('editUserId').value = editBtn.dataset.id;
             document.getElementById('editUsername').value = editBtn.dataset.username;
             document.getElementById('editEmail').value = editBtn.dataset.email;
-            document.getElementById('editUsernameError').textContent = '';
-            document.getElementById('editEmailError').textContent = '';
+            setEditError('username', '');
+            setEditError('email', '');
             editModal?.classList.add('show');
         }
     });
@@ -260,11 +358,20 @@
         editForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('editUserId').value;
-            const username = document.getElementById('editUsername').value.trim();
-            const email = document.getElementById('editEmail').value.trim();
+            const username = document.getElementById('editUsername').value.trim().toLowerCase();
+            const email = document.getElementById('editEmail').value.trim().toLowerCase();
             
-            document.getElementById('editUsernameError').textContent = '';
-            document.getElementById('editEmailError').textContent = '';
+            setEditError('username', '');
+            setEditError('email', '');
+
+            const usernameValidation = getEditUsernameError(username);
+            const emailValidation = getEditEmailError(email);
+
+            if (usernameValidation || emailValidation) {
+                setEditError('username', usernameValidation);
+                setEditError('email', emailValidation);
+                return;
+            }
 
             const saveBtn = document.getElementById('saveEditBtn');
             saveBtn.disabled = true;
@@ -282,8 +389,8 @@
                     editModal?.classList.remove('show');
                     fetchUsers();
                 } else if (data.errors) {
-                    if (data.errors.username) document.getElementById('editUsernameError').textContent = data.errors.username;
-                    if (data.errors.email) document.getElementById('editEmailError').textContent = data.errors.email;
+                    if (data.errors.username) setEditError('username', data.errors.username);
+                    if (data.errors.email) setEditError('email', data.errors.email);
                 } else {
                     alert(data.message || 'Failed to update user');
                 }

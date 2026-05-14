@@ -297,6 +297,39 @@
         .edit-action-btn:hover {
             background: #059669;
         }
+        .delete-confirm-content {
+            max-width: 360px;
+            padding: 24px 26px 22px;
+            border-radius: 10px;
+            transform: scale(0.94) translateY(10px);
+        }
+        .modal-overlay.show .delete-confirm-content {
+            transform: scale(1) translateY(0);
+        }
+        .delete-confirm-content .modal-title {
+            margin-bottom: 10px;
+        }
+        .delete-confirm-message {
+            color: #dbeafe;
+            font-size: 14px;
+            line-height: 1.55;
+            margin: 0;
+        }
+        .delete-confirm-content .modal-actions {
+            margin-top: 22px;
+        }
+        .btn-delete {
+            color: #fff;
+            background: #b91c1c;
+            min-width: 86px;
+        }
+        .btn-delete:hover {
+            background: #951717;
+        }
+        .btn:disabled {
+            cursor: wait;
+            opacity: 0.68;
+        }
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -381,6 +414,48 @@
         }
         .edit-action-btn:hover {
             background: #059669;
+        }
+        #deleteUserModal .delete-confirm-content {
+            max-width: 360px;
+            padding: 24px 26px 22px;
+            border-radius: 10px;
+            transform: scale(0.94) translateY(10px);
+        }
+        #deleteUserModal.show .delete-confirm-content {
+            transform: scale(1) translateY(0);
+        }
+        #editUserModal .modal-content {
+            width: min(460px, calc(100vw - 32px));
+            max-width: 460px;
+            padding: 22px 24px 20px;
+            border-radius: 10px;
+        }
+        #editUserModal .modal-title {
+            margin-bottom: 14px;
+            font-size: 18px;
+        }
+        #editUserModal .form-group {
+            gap: 5px;
+            margin-bottom: 10px !important;
+        }
+        #editUserModal .modal-input {
+            padding: 9px 12px;
+            margin-top: 0;
+        }
+        #editUserModal .error-msg {
+            display: none;
+            color: #ff0000;
+            margin-top: 2px;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1.25;
+            white-space: nowrap;
+        }
+        #editUserModal .error-msg:not(:empty) {
+            display: block;
+        }
+        #editUserModal .modal-actions {
+            margin-top: 16px;
         }
     </style>
 </head>
@@ -518,16 +593,16 @@
     <div id="editUserModal" class="modal-overlay">
         <div class="modal-content">
             <h2 class="modal-title">Edit User</h2>
-            <form id="editUserForm" onsubmit="return false;">
+            <form id="editUserForm" onsubmit="return false;" novalidate>
                 <input type="hidden" id="editUserId">
                 <div class="form-group" style="margin-bottom: 15px;">
                     <label for="editUsername" style="color: #cbd5e1; font-size: 13px;">Username</label>
-                    <input type="text" id="editUsername" name="username" class="modal-input" required>
+                    <input type="text" id="editUsername" name="username" class="modal-input">
                     <div id="editUsernameError" class="error-msg"></div>
                 </div>
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label for="editEmail" style="color: #cbd5e1; font-size: 13px;">Email</label>
-                    <input type="email" id="editEmail" name="email" class="modal-input" required>
+                    <input type="text" id="editEmail" name="email" class="modal-input" inputmode="email">
                     <div id="editEmailError" class="error-msg"></div>
                 </div>
                 <div class="modal-actions">
@@ -541,16 +616,16 @@
     <div id="editUserModal" class="modal-overlay">
         <div class="modal-content">
             <h2 class="modal-title">Edit User</h2>
-            <form id="editUserForm" onsubmit="return false;">
+            <form id="editUserForm" onsubmit="return false;" novalidate>
                 <input type="hidden" id="editUserId">
                 <div class="form-group" style="margin-bottom: 15px;">
                     <label for="editUsername" style="color: #cbd5e1; font-size: 13px; font-weight: 600;">Username</label>
-                    <input type="text" id="editUsername" name="username" class="modal-input" required>
+                    <input type="text" id="editUsername" name="username" class="modal-input">
                     <div id="editUsernameError" class="error-msg"></div>
                 </div>
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label for="editEmail" style="color: #cbd5e1; font-size: 13px; font-weight: 600;">Email</label>
-                    <input type="email" id="editEmail" name="email" class="modal-input" required>
+                    <input type="text" id="editEmail" name="email" class="modal-input" inputmode="email">
                     <div id="editEmailError" class="error-msg"></div>
                 </div>
                 <div class="modal-actions">
@@ -558,6 +633,17 @@
                     <button type="submit" class="btn btn-save" id="saveEditBtn">Save Changes</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div id="deleteUserModal" class="modal-overlay" aria-hidden="true">
+        <div class="modal-content delete-confirm-content" role="dialog" aria-modal="true" aria-labelledby="deleteUserTitle" aria-describedby="deleteUserMessage">
+            <h2 class="modal-title" id="deleteUserTitle">Delete user?</h2>
+            <p class="delete-confirm-message" id="deleteUserMessage">Are you sure you want to delete this user?</p>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-cancel" id="cancelDeleteBtn">Cancel</button>
+                <button type="button" class="btn btn-delete" id="confirmDeleteBtn">Delete</button>
+            </div>
         </div>
     </div>
 
